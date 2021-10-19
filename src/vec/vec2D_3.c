@@ -6,7 +6,7 @@
 /*   By: jceia <jceia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/17 09:39:38 by jceia             #+#    #+#             */
-/*   Updated: 2021/10/08 01:08:36 by jceia            ###   ########.fr       */
+/*   Updated: 2021/10/13 10:20:11 by jceia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,12 @@ float	vec2d_angle(t_vec2d u, t_vec2d v)
 	float	dot_uv;
 
 	dot_uv = vec2d_dot_product(u, v);
-	if (dot_uv == 0)
-		return (0);
 	norm_u = vec2d_norm(u);
 	norm_v = vec2d_norm(v);
 	if (norm_u == 0 || norm_v == 0)
 	{
-		perror("Vector with zero length");
-		return (-1);
+		ft_putstr_error("Vector with zero length\n");
+		return (0);
 	}
 	return (dot_uv / norm_u / norm_v);
 }

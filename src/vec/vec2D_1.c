@@ -6,7 +6,7 @@
 /*   By: jceia <jceia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/01 22:32:05 by jceia             #+#    #+#             */
-/*   Updated: 2021/10/08 01:08:44 by jceia            ###   ########.fr       */
+/*   Updated: 2021/10/13 10:19:15 by jceia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,6 @@ float	vec2d_coord(t_vec2d p, t_coord coord)
 		return (p.x);
 	if (coord == COORD_Y)
 		return (p.y);
-	perror("Invalid coordinate");
+	ft_putstr_error("Invalid coordinate\n");
 	return (0.0);
 }

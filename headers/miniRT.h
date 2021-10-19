@@ -6,7 +6,7 @@
 /*   By: jceia <jceia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/08 10:58:52 by jceia             #+#    #+#             */
-/*   Updated: 2021/10/08 08:56:44 by jceia            ###   ########.fr       */
+/*   Updated: 2021/10/19 10:25:41 by jceia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,10 @@
 
 # include "libft.h"
 # include "vec.h"
+# include "matrix.h"
 
-# define WIN_WIDTH		1080
-# define WIN_HEIGHT		720
+# define WIN_WIDTH		1920
+# define WIN_HEIGHT		1080
 
 # ifdef OS_Linux
 #  define K_LEFT_ARROW	65361
@@ -71,8 +72,10 @@ typedef struct s_ray3d
 	t_vec3d	direction;
 }	t_ray3d;
 
+t_ray3d		ray3d_create(t_vec3d origin, t_vec3d direction);
 t_ray3d		ray3d_from_two_points(t_vec3d p, t_vec3d q);
 t_vec3d		ray3d_at(const t_ray3d *ray, float t);
+t_ray3d		ray3d_reflected(const t_ray3d *ray, t_vec3d normal);
 
 /*
  * Color
@@ -89,10 +92,19 @@ int			get_b(int trgb);
  * 3D Objects
  */
 typedef enum e_object_type {
-	SPHERE,
 	PLANE,
-	CYLINDER
+	TRIANGLE,
+	DISK,
+	SPHERE,
+	CYLINDER,
+	CONE
 }	t_object_type;
+
+typedef enum e_proj
+{
+	PROJ,
+	PARALLEL
+}	t_proj;
 
 typedef struct s_ambient_light
 {
@@ -102,15 +114,15 @@ typedef struct s_ambient_light
 
 typedef struct s_camera
 {
-	t_vec3d	origin;
-	t_vec3d	direction;
-	float	fov;
-	t_vec3d	basis_x;
-	t_vec3d	basis_y;
-	int		pixels_width;
-	int		pixels_height;
-	float	view_width;
-	float	view_height;
+	t_vec3d		origin;
+	t_vec3d		direction;
+	float		fov;
+	t_matrix	*basis;
+	int			pixels_width;
+	int			pixels_height;
+	float		view_width;
+	float		view_height;
+	t_proj		proj_type;
 }	t_camera;
 
 typedef struct s_light
@@ -134,10 +146,26 @@ typedef struct s_plane
 	t_rgb	color;
 }	t_plane;
 
+typedef struct s_triangle
+{
+	t_vec3d	p1;
+	t_vec3d	p2;
+	t_vec3d	p3;
+	t_rgb	color;
+}	t_triangle;
+
+typedef struct s_disk
+{
+	t_vec3d	center;
+	t_vec3d	n;
+	float	radius;
+	t_rgb	color;
+}	t_disk;
+
 typedef struct s_cylinder
 {
 	t_vec3d	p;
-	t_vec3d	n;
+	t_vec3d	direction;
 	float	radius;
 	float	height;
 	t_rgb	color;
@@ -162,7 +190,8 @@ typedef struct s_data
 	int		endian;
 	t_ambient_light
 			ambient;
-	t_list	*cameras;
+	t_camera
+			*camera;
 	t_list	*lights;
 	t_list	*objects;
 	t_rgb	*buf;
@@ -189,16 +218,13 @@ t_data		*parse_light_from_line(t_data *vars, char *line);
 t_data		*parse_object_from_line(t_data *vars, char *line);
 t_object	*parse_sphere_from_line(t_object *obj, char *line);
 t_object	*parse_plane_from_line(t_object *obj, char *line);
-t_object	*parse_cyclinder_from_line(t_object *obj, char *line);
+t_object	*parse_cylinder_from_line(t_object *obj, char *line);
+t_object	*parse_triangle_from_line(t_object *obj, char *line);
+t_object	*parse_disk_from_line(t_object *obj, char *line);
 
 /*
  * MLX UTILS
  */
-typedef enum e_projection
-{
-	PROJ,
-	PARALLEL
-}	t_projection;
 
 void		plot_pixel(t_data *data, float x, float y, t_rgb color);
 void		update_image_from_buf(t_data *data);
@@ -218,8 +244,26 @@ void		*clean_exit(void *ptr, char *msg, void (*del)(void *), int do_exit);
  */
 void		calculate_camera_params(t_camera *cam,
 				int win_width, int win_height);
-void		calculate_camera_list_params(t_list *cam_list,
-				int win_width, int win_height);
+void		camera_clean(void *ptr);
+
+/*
+ * 2nd degree equations
+ */
+
+typedef struct s_float_pair
+{
+	float		min;
+	float		max;
+}	t_float_pair;
+
+typedef struct s_deg2_eq_coefs
+{
+	float	a;
+	float	b;
+	float	c;
+}	t_deg2_eq_coefs;
+
+t_bool		deg2_eq_solutions(const t_deg2_eq_coefs *params, t_float_pair *t);
 
 /*
  * Raytracer (Core)
@@ -233,12 +277,28 @@ typedef struct s_hit_record
 	float		t;
 }	t_hit_record;
 
-t_rgb		hit_color(const t_hit_record *hit_record,
+t_rgb		hit_color(
+				const t_ray3d *reflected_ray,
+				const t_hit_record *hit_record,
 				const t_data *vars);
-t_bool		hit_object(const t_ray3d *ray, t_object *obj, t_hit_record *record);
-void		raytrace_scenario(const t_data *vars);
+void		raytrace_scenario(t_data *vars);
 t_rgb		raytrace_single(const t_ray3d *ray, const t_data *vars);
+
 t_bool		raytrace_hit(const t_ray3d *ray, const t_data *vars,
-				t_hit_record *record);
+				float t_min, t_hit_record *record);
+
+t_bool		hit_object(const t_ray3d *ray, t_object *obj,
+				float t_min, t_hit_record *record);
+
+t_bool		hit_sphere(const t_ray3d *ray, const t_sphere *sphere,
+				float t_min, t_hit_record *record);
+t_bool		hit_plane(const t_ray3d *ray, const t_plane *plane,
+				float t_min, t_hit_record *record);
+t_bool		hit_cylinder(const t_ray3d *ray, const t_cylinder *cyclinder,
+				float t_min, t_hit_record *record);
+t_bool		hit_triangle(const t_ray3d *ray, const t_triangle *triangle,
+				float t_min, t_hit_record *record);
+t_bool		hit_disk(const t_ray3d *ray, const t_disk *disk,
+				float t_min, t_hit_record *record);
 
 #endif

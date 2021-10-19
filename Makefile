@@ -42,7 +42,7 @@ ifneq ($(OS), Linux)
 	$(MAKE) -C $(MLX_DIR)
 endif
 	$(MAKE) -C $(LIBFT_DIR)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $^ -o $@ $(LDFLAGS)
 
 all: $(NAME)
 

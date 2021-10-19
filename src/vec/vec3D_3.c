@@ -6,7 +6,7 @@
 /*   By: jceia <jceia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/17 09:39:38 by jceia             #+#    #+#             */
-/*   Updated: 2021/10/08 01:16:28 by jceia            ###   ########.fr       */
+/*   Updated: 2021/10/13 10:20:41 by jceia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,12 @@ float	vec3d_angle(t_vec3d u, t_vec3d v)
 	float	dot_uv;
 
 	dot_uv = vec3d_dot_product(u, v);
-	if (dot_uv == 0)
-		return (0);
 	norm_u = vec3d_norm(u);
 	norm_v = vec3d_norm(v);
 	if (norm_u == 0 || norm_v == 0)
 	{
-		perror("Vector with zero length");
-		return (-1);
+		ft_putstr_error("Vector with zero length\n");
+		return (0);
 	}
 	return (dot_uv / norm_u / norm_v);
 }

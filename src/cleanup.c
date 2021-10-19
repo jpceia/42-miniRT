@@ -6,7 +6,7 @@
 /*   By: jceia <jceia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/08 14:47:48 by jceia             #+#    #+#             */
-/*   Updated: 2021/10/08 08:26:43 by jceia            ###   ########.fr       */
+/*   Updated: 2021/10/16 22:20:56 by jceia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	mlx_data_clean(void *ptr)
 		free(vars->mlx);
 		vars->mlx = NULL;
 	}
-	ft_lstclear(&vars->cameras, free);
+	camera_clean(vars->camera);
 	ft_lstclear(&vars->lights, free);
 	ft_lstclear(&vars->objects, object_clean);
 	if (vars->buf)

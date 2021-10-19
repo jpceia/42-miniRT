@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser2.c                                          :+:      :+:    :+:   */
+/*   parse_items.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jceia <jceia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/08 12:29:55 by jceia             #+#    #+#             */
-/*   Updated: 2021/10/08 07:48:07 by jceia            ###   ########.fr       */
+/*   Updated: 2021/10/16 22:22:33 by jceia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,26 +37,24 @@ t_data	*parse_ambient_from_line(t_data *vars, char *line)
 
 t_data	*parse_camera_from_line(t_data *vars, char *line)
 {
-	t_camera	*camera;
 	char		**s_split;
 	int			n;
 
 	n = ft_strwc(line, ' ');
 	if (n != 4)
 		return (clean_exit(NULL, "Line with incorrect format", NULL, 0));
-	camera = (t_camera *)malloc(sizeof(*camera));
-	if (!camera)
+	vars->camera = (t_camera *)malloc(sizeof(*vars->camera));
+	if (!vars->camera)
 		return (clean_exit(NULL, "Error allocating memory", NULL, 0));
 	s_split = ft_split(line, ' ');
 	if (!s_split)
-		return (clean_exit(camera, "Error spliting line", free, 0));
-	if (!parse_vec3d(&camera->origin, s_split[1]))
-		return (clean_exit(camera, "Error parsing vector", free, 0));
-	if (!parse_vec3d(&camera->direction, s_split[2]))
-		return (clean_exit(camera, "Error parsing vector", free, 0));
-	camera->fov = ft_atof(s_split[3]);
+		return (clean_exit(vars->camera, "Error spliting line", free, 0));
+	if (!parse_vec3d(&vars->camera->origin, s_split[1]))
+		return (clean_exit(vars->camera, "Error parsing vector", free, 0));
+	if (!parse_vec3d(&vars->camera->direction, s_split[2]))
+		return (clean_exit(vars->camera, "Error parsing vector", free, 0));
+	vars->camera->fov = ft_atof(s_split[3]);
 	ft_str_array_clear(s_split, n);
-	ft_lstpush_front(&vars->cameras, camera);
 	return (vars);
 }
 

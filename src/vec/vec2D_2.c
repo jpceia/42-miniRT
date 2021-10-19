@@ -6,7 +6,7 @@
 /*   By: jceia <jceia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 06:48:02 by jceia             #+#    #+#             */
-/*   Updated: 2021/10/08 01:08:36 by jceia            ###   ########.fr       */
+/*   Updated: 2021/10/13 14:18:46 by jceia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ t_vec2d	vec2d_normalize(t_vec2d v)
 
 float	vec2d_dot_product(t_vec2d u, t_vec2d v)
 {
-	return (u.x * v.x + u.y + v.y);
+	return (u.x * v.x + u.y * v.y);
 }
 
 float	vec2d_cross_product(t_vec2d u, t_vec2d v)

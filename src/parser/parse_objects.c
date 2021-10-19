@@ -6,7 +6,7 @@
 /*   By: jceia <jceia@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/08 12:26:46 by jceia             #+#    #+#             */
-/*   Updated: 2021/10/08 08:19:34 by jceia            ###   ########.fr       */
+/*   Updated: 2021/10/19 01:44:38 by jceia            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,18 @@ t_data	*parse_object_from_line(t_data *vars, char *line)
 	}
 	else if (strncmp(line, "cy ", 3) == 0)
 	{
-		if (!parse_plane_from_line(obj, line))
+		if (!parse_cylinder_from_line(obj, line))
 			return (clean_exit(obj, "Unable to parse cylinder obj", free, 0));
+	}
+	else if (strncmp(line, "tr ", 3) == 0)
+	{
+		if (!parse_triangle_from_line(obj, line))
+			return (clean_exit(obj, "Unable to parse triangle obj", free, 0));
+	}
+	else if (strncmp(line, "di ", 3) == 0)
+	{
+		if (!parse_disk_from_line(obj, line))
+			return (clean_exit(obj, "Unable to parse disk obj", free, 0));
 	}
 	else
 		return (clean_exit(obj, "Unrecognized object type", free, 0));
@@ -92,12 +102,13 @@ t_object	*parse_plane_from_line(t_object *obj, char *line)
 		return (clean_exit(plane, "Error parsing vector", free, 0));
 	if (!parse_color(&plane->color, s_split[3]))
 		return (clean_exit(plane, "Error parsing rgb color", free, 0));
+	plane->n = vec3d_normalize(plane->n);
 	ft_str_array_clear(s_split, n);
 	obj->data = plane;
 	return (obj);
 }
 
-t_object	*parse_cyclinder_from_line(t_object *obj, char *line)
+t_object	*parse_cylinder_from_line(t_object *obj, char *line)
 {
 	t_cylinder	*cylinder;
 	char		**s_split;
@@ -115,8 +126,9 @@ t_object	*parse_cyclinder_from_line(t_object *obj, char *line)
 		return (clean_exit(cylinder, "Error spliting line", free, 0));
 	if (!parse_vec3d(&cylinder->p, s_split[1]))
 		return (clean_exit(cylinder, "Error parsing vector", free, 0));
-	if (!parse_vec3d(&cylinder->n, s_split[2]))
+	if (!parse_vec3d(&cylinder->direction, s_split[2]))
 		return (clean_exit(cylinder, "Error parsing vector", free, 0));
+	cylinder->direction = vec3d_normalize(cylinder->direction);
 	cylinder->radius = ft_atof(s_split[3]) / 2;
 	cylinder->height = ft_atof(s_split[4]);
 	if (!parse_color(&cylinder->color, s_split[5]))

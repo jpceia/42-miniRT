@@ -47,7 +47,7 @@ void	update_image_from_buf(t_data *vars)
 		j = 0;
 		while (j < vars->width)
 		{
-			plot_pixel(vars, i, j, vars->buf[i * vars->width + j]);
+			plot_pixel(vars, j, i, vars->buf[i * vars->width + j]);
 			j++;
 		}
 		i++;
@@ -56,8 +56,8 @@ void	update_image_from_buf(t_data *vars)
 
 void	mlx_data_update_image(t_data *vars)
 {
-	calculate_camera_list_params(
-		vars->cameras, vars->width, vars->height);
+	calculate_camera_params(
+		vars->camera, vars->width, vars->height);
 	vars->img = mlx_new_image(vars->mlx, vars->width, vars->height);
 	vars->addr = mlx_get_data_addr(vars->img, &vars->bits_per_pixel,
 			&vars->line_length, &vars->endian);
